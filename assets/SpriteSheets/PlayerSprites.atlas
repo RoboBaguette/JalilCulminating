@@ -95,35 +95,35 @@ adventurer-air-attack3-rdy-00
   orig: 50, 37
   offset: 0, 0
   index: -1
-attackRight
+attack
   rotate: false
   xy: 158, 158
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-attackRight
+attack
   rotate: false
   xy: 210, 197
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-attackRight
+attack
   rotate: false
   xy: 2, 2
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-attackRight
+attack
   rotate: false
   xy: 54, 41
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-attackRight
+attack
   rotate: false
   xy: 106, 80
   size: 50, 37
@@ -375,63 +375,63 @@ adventurer-crouch-03
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-00
+dead
   rotate: false
   xy: 314, 2
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-hurt-00
+hurt
   rotate: false
   xy: 314, 2
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-01
+dead
   rotate: false
   xy: 366, 41
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-hurt-01
+hurt
   rotate: false
   xy: 366, 41
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-02
+dead
   rotate: false
   xy: 418, 80
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-03
+dead
   rotate: false
   xy: 470, 119
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-04
+dead
   rotate: false
   xy: 522, 158
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-06
+dead
   rotate: false
   xy: 522, 158
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-die-05
+dead
   rotate: false
   xy: 574, 197
   size: 50, 37
@@ -452,7 +452,7 @@ falling
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-hurt-02
+hurt
   rotate: false
   xy: 470, 80
   size: 50, 37
@@ -536,28 +536,28 @@ adventurer-items-02
   orig: 50, 37
   offset: 0, 0
   index: -1
-jumpRight
+jump
   rotate: false
   xy: 574, 80
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-jumpRight
+jump
   rotate: false
   xy: 626, 119
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-jumpRight
+jump
   rotate: false
   xy: 678, 158
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-jumpRight
+jump
   rotate: false
   xy: 730, 197
   size: 50, 37
@@ -592,42 +592,42 @@ adventurer-ladder-climb-03
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-run-00
+run
   rotate: false
   xy: 730, 158
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-run-01
+run
   rotate: false
   xy: 782, 197
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-run-02
+run
   rotate: false
   xy: 574, 2
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-run-03
+run
   rotate: false
   xy: 626, 41
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-run-04
+run
   rotate: false
   xy: 678, 80
   size: 50, 37
   orig: 50, 37
   offset: 0, 0
   index: -1
-adventurer-run-05
+run
   rotate: false
   xy: 730, 119
   size: 50, 37

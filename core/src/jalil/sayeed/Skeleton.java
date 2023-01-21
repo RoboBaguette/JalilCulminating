@@ -1,81 +1,83 @@
 package jalil.sayeed;
 
-import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import sun.security.pkcs11.wrapper.CK_SSL3_KEY_MAT_OUT;
 
 import static jalil.sayeed.Utils.Constants.PPM;
 
-public class Eye{
+public class Skeleton {
     private int health;
     private boolean canBeHit;
     private boolean isAttacked;
     private boolean dead;
-    private enum State {DEAD, FLYING, ATTACKING, HURT}
-    private boolean lookRight;
-    public Animation<TextureRegion> fly;
-    TextureRegion currentFrame;
-    private World world;
+    private enum State {DEAD, IDLE, WALKING, ATTACKING, HURT}
     private State currentState;
     private State previousState;
-    private Animation<TextureRegion> move;
-    private Animation<TextureRegion> attack;
-    private Animation<TextureRegion> hurt;
+    private boolean lookRight;
+    private Animation<TextureRegion> run;
     private Animation<TextureRegion> death;
+    private Animation<TextureRegion> standing;
+    private Animation<TextureRegion> walk;
+    private Animation<TextureRegion> hurt;
+    private Animation<TextureRegion> attack;
+    private Animation<TextureRegion> idle;
+
+
     private float stateTimer;
-    private boolean runningRight;
+    TextureRegion currentFrame;
+    private World world;
     private boolean isAttacking;
     private Body body;
     private int x;
     private int y;
     private SpriteBatch batch;
     private float timer;
-    private float timer2;
-    public boolean onFloor;
     private float attackTimer;
+    private boolean runningRight;
     private boolean isHitting;
+    private boolean currentlyAttacking;
 
     /**
-     * Constructor for Eye class
+     * Constructor for Skeleton Class
      * @param x
      * @param y
      * @param world
-     * @param death
-     * @param fly
-     * @param hurt
      * @param attack
+     * @param death
+     * @param hurt
+     * @param walk
      * @param batch
      */
-    Eye(int x, int y, World world, Animation<TextureRegion> death, Animation<TextureRegion> fly, Animation<TextureRegion> hurt, Animation<TextureRegion> attack, SpriteBatch batch) {
+    Skeleton(int x, int y, World world, Animation<TextureRegion> attack, Animation<TextureRegion> death, Animation<TextureRegion> hurt, Animation<TextureRegion> walk, Animation<TextureRegion> idle, SpriteBatch batch){
         this.x = x;
         this.y = y;
         this.world = world;
         this.death = death;
         this.hurt = hurt;
         this.attack = attack;
+        this.walk = walk;
+        this.idle = idle;
         this.batch = batch;
-        this.fly = fly;
-        isHitting = false;
         dead = false;
         isAttacked = false;
-        canBeHit = true;
+        canBeHit = false;
         health = 4;
         isAttacking = false;
+        canBeHit = true;
+        health = 6;
         stateTimer = 0;
         timer = 0;
         lookRight = true;
-        timer2 = 0;
-        attackTimer = 0;
-        onFloor = false;
+        timer = 0;
+        isHitting = false;
+        currentlyAttacking = false;
     }
 
     /**
-     * Updates the eye
+     * Updates the Skeleton
      * @param delta
      * @param isPlayerAttacking
      * @param playerBody
@@ -84,56 +86,54 @@ public class Eye{
     public void update(float delta, boolean isPlayerAttacking, Body playerBody, float attackTime) {
         timer += delta;
 
-        int velocityX = 0;
-        int velocityY = 0;
+        int velocity = 0;;
 
-        // Runs basic movement for the eye that follows the player if it isn't dead
+        // Basic movement for the Skeleton if it isn't dead
         if(!dead) {
-            if (playerBody.getPosition().x > body.getPosition().x) {
-                velocityX += 1;
+            if (playerBody.getPosition().x > body.getPosition().x && playerBody.getPosition().x < x + 20 && playerBody.getPosition().x > x - 20  && playerBody.getPosition().y < body.getPosition().y + 8 && playerBody.getPosition().y > body.getPosition().y - 1) {
+                velocity += 1;
                 lookRight = true;
-            }
-            if (playerBody.getPosition().x < body.getPosition().x) {
-                velocityX -= 1;
+            } else if (playerBody.getPosition().x < body.getPosition().x && playerBody.getPosition().x < x + 20 && playerBody.getPosition().x > x - 20  && playerBody.getPosition().y < body.getPosition().y + 8 && playerBody.getPosition().y > body.getPosition().y - 1) {
+                velocity -= 1;
                 lookRight = false;
             }
-            if (playerBody.getPosition().y < body.getPosition().y) {
-                velocityY -= 1;
-            }
-            if (playerBody.getPosition().y > body.getPosition().y) {
-                velocityY += 1;
-            }
         }
 
-        // Stops the Eye if its attacked and moves the eye if isAttacked is false
+        // If the Skeleton isAttacked or if the skeleton isAttacking stop the skeleton from moving
         if(isAttacked){
             body.setLinearVelocity(0, 0);
-        } else {
-            body.setLinearVelocity(velocityX * 2, velocityY * 2);
+        } else if(isAttacking){
+            body.setLinearVelocity(0, 0);
         }
+        else{
+            body.setLinearVelocity(velocity * 2, body.getLinearVelocity().y);
+        }
+
+        System.out.println(body.getLinearVelocity().x);
         draw(delta);
         hit(isPlayerAttacking, playerBody, attackTime);
+        attack(playerBody, delta);
     }
 
     /**
-     * Draw the Eye's current frame
+     * Draws the Skeleton on screen
      * @param delta
      */
-    public void draw(float delta) {
+    public void draw(float delta){
         getFrame(delta);
         batch.begin();
-        batch.draw(currentFrame, body.getPosition().x * PPM - 80, body.getPosition().y * PPM - 70, currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
+        batch.draw(currentFrame, body.getPosition().x * PPM - 80, body.getPosition().y * PPM -70, currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
         batch.end();
     }
 
     /**
-     * Gets the currentFrame of the Eye depending on it's curret state
+     * Gets the currentFrame of the Skeleton depending on what state its in
      * @param dt
      */
-    public void getFrame(float dt) {
+    public void getFrame(float dt){
         currentState = getState();
 
-        switch (currentState) {
+        switch(currentState){
             case DEAD:
                 currentFrame = death.getKeyFrame(stateTimer, false);
                 break;
@@ -144,12 +144,16 @@ public class Eye{
                 attackTimer += dt;
                 currentFrame = attack.getKeyFrame(stateTimer, true);
                 break;
-            case FLYING:
+            case WALKING:
+                currentFrame = walk.getKeyFrame(stateTimer, true);
+                break;
+            case IDLE:
             default:
-                currentFrame = fly.getKeyFrame(stateTimer, true);
+                currentFrame = idle.getKeyFrame(stateTimer, true);
+
         }
 
-        // Flips the Eye depending on which side its facing
+        // Depending on if the Skeleton is looking right or not, flip the Skeleton
         if (!lookRight && !currentFrame.isFlipX()) {
             currentFrame.flip(true, false);
         } else if (lookRight && currentFrame.isFlipX()) {
@@ -160,30 +164,28 @@ public class Eye{
     }
 
     /**
-     * Creates the Eye's body
+     * Create the Skeleton's body
      * @param x
      * @param y
      */
-    public void createBody(int x, int y) {
-        // Initialize body
+    public void createBody(int x, int y){
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(x, y);
         bodyDef.fixedRotation = false;
 
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(32 / 2.2f / PPM, 32 / 2 / PPM / 1.2f);
+        shape.setAsBox(32 / 2 / PPM, 32 / 1.4f /PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0;
         fixtureDef.friction = 0.8f;
         fixtureDef.restitution = 0;
-        fixtureDef.filter.categoryBits = (short) 2;
-        fixtureDef.filter.maskBits = (short) 2;
-
+        fixtureDef.filter.categoryBits = (short) 1;
+        fixtureDef.filter.maskBits = (short) 1;
 
         body.createFixture(fixtureDef).setUserData(this);
 
@@ -191,7 +193,7 @@ public class Eye{
     }
 
     /**
-     * Gets the Eye's body
+     * Get the Skeleton's body
      * @return
      */
     public Body getBody() {
@@ -200,38 +202,40 @@ public class Eye{
     }
 
     /**
-     * Gets the Eyes current state based on what it is doing
+     * Gets the currentState of the Skeleton
      * @return
      */
-    public State getState() {
-        if (dead) {
+    public State getState(){
+        // Depending on what the Skeleton is currently doing, set the state to the corresponding action
+        if(dead){
             return State.DEAD;
-        } else if (isAttacked) {
+        }else if(isAttacked){
             return State.HURT;
         } else if (isAttacking) {
             return State.ATTACKING;
-        } else {
-            return State.FLYING;
+        } else if(body.getLinearVelocity().x == 0){
+            return State.IDLE;
+        }
+        else{
+            return State.WALKING;
         }
     }
 
     /**
-     * Checks if the player is hit
+     * Checks if the Skeleton has been hit
      * @param isPlayerAttacking
      * @param playerBody
      * @param attackTime
      */
     public void hit(boolean isPlayerAttacking, Body playerBody, float attackTime){
-        // Creates an area where the player can hit the Eye if the player is attacking and detects if it is attacked or not
-        if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
+        if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1  && isPlayerAttacking && attackTime > 0.2 && canBeHit ){
             isAttacked = true;
             health -= 1;
 
-        } else if(body.getPosition().x - playerBody.getPosition().x < 2 && body.getPosition().x - playerBody.getPosition().x > -1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
+        } else if(body.getPosition().x - playerBody.getPosition().x < 2 && body.getPosition().x - playerBody.getPosition().x > -1 && isPlayerAttacking  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1 && attackTime > 0.2 && canBeHit){
             isAttacked = true;
             health -= 1;
         }
-        // Resets variables
         if(attackTime > 0 && isAttacked){
             canBeHit = false;
         } else{
@@ -243,6 +247,11 @@ public class Eye{
         }
     }
 
+    /**
+     * Checks if the Skeleton is attacking
+     * @param playerBody
+     * @param delta
+     */
     public void attack(Body playerBody, float delta){
         if(!(attackTimer > 0)){
             isAttacking = false;
@@ -272,5 +281,13 @@ public class Eye{
             isHitting = false;
         }
 
+    }
+
+    /**
+     * Get a boolean value of whether or not the Skeleton is hitting
+     * @return
+     */
+    public boolean isHitting(){
+        return isHitting;
     }
 }

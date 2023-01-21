@@ -19,48 +19,53 @@ import jalil.sayeed.Utils.TiledUtil;
 
 import static jalil.sayeed.Utils.Constants.PPM;
 
-public class Driver extends ApplicationAdapter {
+public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private World world;
     private Box2DDebugRenderer debugRenderer;
     private OrthographicCamera camera;
-    private BodyDef bodyDef;
-    private BodyDef groundBodyDef;
-    private Body groundBody;
     private Body playerBody;
-    private boolean isJump;
     private TiledMap map;
     private OrthogonalTiledMapRenderer mapRenderer;
     private Texture background1;
     private Texture background2;
     private Texture background3;
     private Texture playerSprite;
-    // Change name
-    private TextureAtlas rightRightAtlas;
-
     private TextureAtlas atlas;
     private TextureAtlas enemyAtlas;
-    private Body eyeBody;
-    private Eye eye;
-
-    private Animation<TextureRegion> runRight;
-    private Animation<TextureRegion> jumpRight;
-    private Animation<TextureRegion> idleRight;
-    private Animation<TextureRegion> falling;
-    private Animation<TextureRegion> attack;
-    private Animation<TextureRegion> slide;
+    private Body eyeBody1;
+    private Eye eye1;
+    private Animation<TextureRegion> playerRun;
+    private Animation<TextureRegion> playerJump;
+    private Animation<TextureRegion> playerIdle;
+    private Animation<TextureRegion> playerFalling;
+    private Animation<TextureRegion> playerAttack;
+    private Animation<TextureRegion> playerSlide;
+    private Animation<TextureRegion> playerHurt;
+    private Animation<TextureRegion> playerDead;
 
     private Animation<TextureRegion> eyeFly;
     private Animation<TextureRegion> eyeAttack;
     private Animation<TextureRegion> eyeHurt;
     private Animation<TextureRegion> eyeDeath;
+    private Body skeletonBody1;
+    private Skeleton skeleton1;
+    private Animation<TextureRegion> skeletonAttack;
+    private Animation<TextureRegion> skeletonWalk;
+    private Animation<TextureRegion> skeletonDeath;
+    private Animation<TextureRegion> skeletonHurt;
+    private Animation<TextureRegion> skeletonIdle;
 
-    private float elapsedTime;
     private Player player;
     private final float frameTime = 1 / 5f;
 
+
+    /**
+     * Create everything in the game
+     */
     @Override
     public void create() {
+        // Initialize Box2D
         Box2D.init();
 
         float height = Gdx.graphics.getHeight();
@@ -83,38 +88,68 @@ public class Driver extends ApplicationAdapter {
 
         mapRenderer = new OrthogonalTiledMapRenderer(map);
 
+
         // Setup background
         background1 = new Texture(Gdx.files.internal("Tile Sets/FPSET1_v2.0/SET1/_PNG/SET1_bakcground_day1.png"));
         background2 = new Texture(Gdx.files.internal("Tile Sets/FPSET1_v2.0/SET1/_PNG/SET1_bakcground_day2.png"));
         background3 = new Texture(Gdx.files.internal("Tile Sets/FPSET1_v2.0/SET1/_PNG/SET1_bakcground_day3.png"));
 
-        // Create player
 
         // Create player animations
-        rightRightAtlas = new TextureAtlas(Gdx.files.internal("SpriteSheets/RunRightSheet.atlas"));
-        runRight = new Animation(frameTime, rightRightAtlas.findRegions("runRight"));
-        runRight.setFrameDuration(frameTime);
+        atlas = new TextureAtlas(Gdx.files.internal("SpriteSheets/PlayerSprites.atlas"));
 
-        atlas = new TextureAtlas(Gdx.files.internal("SpriteSheets/SpritesRight.atlas"));
-        jumpRight = new Animation(frameTime, atlas.findRegions("jumpRight"));
-        jumpRight.setFrameDuration(frameTime);
+        playerDead = new Animation(frameTime, atlas.findRegions("dead"));
+        playerDead.setFrameDuration(frameTime);
 
-        idleRight = new Animation(frameTime, atlas.findRegions("idle"));
-        idleRight.setFrameDuration(frameTime);
+        playerRun = new Animation(frameTime, atlas.findRegions("run"));
+        playerRun.setFrameDuration(frameTime);
 
-        falling = new Animation(frameTime, atlas.findRegions("falling"));
-        falling.setFrameDuration(frameTime);
+        playerJump = new Animation(frameTime, atlas.findRegions("jump"));
+        playerJump.setFrameDuration(frameTime);
 
-        attack = new Animation(frameTime, atlas.findRegions("attackRight"));
-        attack.setFrameDuration(frameTime);
+        playerIdle = new Animation(frameTime, atlas.findRegions("idle"));
+        playerIdle.setFrameDuration(frameTime);
 
-        slide = new Animation(frameTime, atlas.findRegions("slide"));
-        slide.setFrameDuration(frameTime);
+        playerFalling = new Animation(frameTime, atlas.findRegions("falling"));
+        playerFalling.setFrameDuration(frameTime);
 
+        playerAttack = new Animation(frameTime, atlas.findRegions("attack"));
+        playerAttack.setFrameDuration(frameTime);
+
+        playerSlide = new Animation(frameTime, atlas.findRegions("slide"));
+        playerSlide.setFrameDuration(frameTime);
+
+        playerHurt = new Animation(frameTime, atlas.findRegions("hurt"));
+        playerHurt.setFrameDuration(frameTime);
+
+        // Create Enemy Animations
         enemyAtlas = new TextureAtlas(Gdx.files.internal("SpriteSheets/Enemies.atlas"));
 
+        // Fly animations
         eyeFly = new Animation(frameTime, enemyAtlas.findRegions("EyeFly"));
         eyeFly.setFrameDuration(frameTime);
+
+        eyeHurt = new Animation(frameTime, enemyAtlas.findRegions("EyeHurt"));
+        eyeHurt.setFrameDuration(frameTime);
+
+        eyeDeath = new Animation(frameTime, enemyAtlas.findRegions("EyeDeath"));
+        eyeDeath.setFrameDuration(frameTime);
+
+        // Skeleton Animations
+        skeletonWalk = new Animation(frameTime, enemyAtlas.findRegions("SkeletonWalk"));
+        skeletonWalk.setFrameDuration(frameTime);
+
+        skeletonHurt = new Animation(frameTime, enemyAtlas.findRegions("SkeletonHurt"));
+        skeletonHurt.setFrameDuration(frameTime);
+
+        skeletonAttack = new Animation(frameTime, enemyAtlas.findRegions("SkeletonAttack"));
+        skeletonAttack.setFrameDuration(frameTime);
+
+        skeletonDeath = new Animation(frameTime, enemyAtlas.findRegions("SkeletonDeath"));
+        skeletonDeath.setFrameDuration(frameTime);
+
+        skeletonIdle = new Animation(frameTime, enemyAtlas.findRegions("SkeletonIdle"));
+        skeletonIdle.setFrameDuration(frameTime);
 
         // Setup contact listener
         this.world.setContactListener(new ContactListener());
@@ -122,27 +157,30 @@ public class Driver extends ApplicationAdapter {
         // Setup players and enemies
         int x = 10;
         int y = 60;
-        eye = new Eye(x, y, world, eyeFly, eyeFly, eyeFly, batch);
-        eyeBody = eye.getBody();
+        eye1 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeFly, batch);
+        eyeBody1 = eye1.getBody();
 
-        player = new Player(x, y, world, runRight, jumpRight, idleRight, falling, attack, slide);
+        player = new Player(x, y, world, playerRun, playerJump, playerIdle, playerFalling, playerAttack, playerSlide, playerHurt, playerDead);
+        player.createBody(x, y);
+
         playerBody = player.getBody();
         playerSprite = player.getPlayerSprite();
 
-//		textureAtlas = new TextureAtlas(Gdx.files.internal("SpriteSheets/RunRightSheet.atlas"));
-        //	textureRegion = textureAtlas.findRegion("adventurer-run-00");
-
-
+        x = 40;
+        y = 62;
+        skeleton1 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
+        skeletonBody1 = skeleton1.getBody();
     }
 
+    /**
+     * Render everything in the game
+     */
     @Override
     public void render() {
-        // Initial Setup
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         float x = playerBody.getPosition().x * PPM - (playerSprite.getWidth() * 5 + 20);
         float y = playerBody.getPosition().y * PPM - (playerSprite.getHeight() * 5);
-
         // Draw background
         batch.begin();
         batch.draw(background1, x, y);
@@ -150,16 +188,15 @@ public class Driver extends ApplicationAdapter {
         batch.draw(background3, x, y);
         batch.end();
 
-        // Render map
+        // Render tile map
         mapRenderer.render();
+       // debugRenderer.render(world, camera.combined.scl(PPM));
 
-        // Setup debugRenderer
-        debugRenderer.render(world, camera.combined.scl(PPM));
         update(Gdx.graphics.getDeltaTime());
     }
 
     /**
-     * Updates the camera
+     * Update camera according to player position
      */
     public void cameraUpdate() {
         Vector3 position = camera.position;
@@ -172,22 +209,23 @@ public class Driver extends ApplicationAdapter {
     }
 
     /**
-     * General update method
+     * Update Everything in the game
      * @param delta
      */
     public void update(float delta) {
         world.step(1 / 60f, 6, 2);
         cameraUpdate();
 
-        eye.draw(delta);
-        eye.move(delta);
+        skeleton1.update(delta,player.isAttacking(), playerBody, player.getAttackTime());
+        eye1.update(delta,player.isAttacking(), playerBody, player.getAttackTime());
         batch.setProjectionMatrix(camera.combined);
         player.input(batch, delta);
+        player.hit(skeleton1.isHitting());
         mapRenderer.setView(camera);
     }
 
     /**
-     * Disposes anything that can be disposed
+     * Dispose
      */
     @Override
     public void dispose() {
@@ -200,7 +238,6 @@ public class Driver extends ApplicationAdapter {
         background1.dispose();
         background2.dispose();
         background3.dispose();
-        rightRightAtlas.dispose();
         enemyAtlas.dispose();
         atlas.dispose();
     }
