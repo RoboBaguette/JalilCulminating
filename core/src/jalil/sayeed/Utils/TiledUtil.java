@@ -5,7 +5,12 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-
+/**
+ * Fllename: TiledUtil.java
+ * Author: Jalil, S
+ * Date Created: December 20th
+ * Description: This class is responsible for creating collision lines from the tiled map
+ */
 public class TiledUtil {
     public static void parseTiledObjectLayer(World world, MapObjects objects) {
         for (MapObject object : objects) {

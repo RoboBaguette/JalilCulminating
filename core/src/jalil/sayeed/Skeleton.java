@@ -4,11 +4,16 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.*;
-import sun.security.pkcs11.wrapper.CK_SSL3_KEY_MAT_OUT;
 
 import static jalil.sayeed.Utils.Constants.PPM;
 
-public class Skeleton {
+/**
+ * Fllename: Skeleton.java
+ * Author: Jalil, S
+ * Date Created: January 16th
+ * Description: This class is responsible for all things regarding the Skeleton enemy
+ */
+public class Skeleton extends Enemies{
     private int health;
     private boolean canBeHit;
     private boolean isAttacked;
@@ -83,6 +88,7 @@ public class Skeleton {
      * @param playerBody
      * @param attackTime
      */
+    @Override
     public void update(float delta, boolean isPlayerAttacking, Body playerBody, float attackTime) {
         timer += delta;
 
@@ -90,10 +96,10 @@ public class Skeleton {
 
         // Basic movement for the Skeleton if it isn't dead
         if(!dead) {
-            if (playerBody.getPosition().x > body.getPosition().x && playerBody.getPosition().x < x + 20 && playerBody.getPosition().x > x - 20  && playerBody.getPosition().y < body.getPosition().y + 8 && playerBody.getPosition().y > body.getPosition().y - 1) {
+            if (playerBody.getPosition().x > body.getPosition().x && playerBody.getPosition().x < x + 20 && playerBody.getPosition().x > x - 20  && playerBody.getPosition().y < body.getPosition().y + 8 && playerBody.getPosition().y > body.getPosition().y - 8) {
                 velocity += 1;
                 lookRight = true;
-            } else if (playerBody.getPosition().x < body.getPosition().x && playerBody.getPosition().x < x + 20 && playerBody.getPosition().x > x - 20  && playerBody.getPosition().y < body.getPosition().y + 8 && playerBody.getPosition().y > body.getPosition().y - 1) {
+            } else if (playerBody.getPosition().x < body.getPosition().x && playerBody.getPosition().x < x + 20 && playerBody.getPosition().x > x - 20  && playerBody.getPosition().y < body.getPosition().y + 8 && playerBody.getPosition().y > body.getPosition().y - 8) {
                 velocity -= 1;
                 lookRight = false;
             }
@@ -109,7 +115,6 @@ public class Skeleton {
             body.setLinearVelocity(velocity * 2, body.getLinearVelocity().y);
         }
 
-        System.out.println(body.getLinearVelocity().x);
         draw(delta);
         hit(isPlayerAttacking, playerBody, attackTime);
         attack(playerBody, delta);
@@ -119,6 +124,7 @@ public class Skeleton {
      * Draws the Skeleton on screen
      * @param delta
      */
+    @Override
     public void draw(float delta){
         getFrame(delta);
         batch.begin();
@@ -130,9 +136,9 @@ public class Skeleton {
      * Gets the currentFrame of the Skeleton depending on what state its in
      * @param dt
      */
+    @Override
     public void getFrame(float dt){
         currentState = getState();
-
         switch(currentState){
             case DEAD:
                 currentFrame = death.getKeyFrame(stateTimer, false);
@@ -168,6 +174,7 @@ public class Skeleton {
      * @param x
      * @param y
      */
+    @Override
     public void createBody(int x, int y){
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -196,6 +203,7 @@ public class Skeleton {
      * Get the Skeleton's body
      * @return
      */
+    @Override
     public Body getBody() {
         createBody(x, y);
         return body;
@@ -205,6 +213,7 @@ public class Skeleton {
      * Gets the currentState of the Skeleton
      * @return
      */
+
     public State getState(){
         // Depending on what the Skeleton is currently doing, set the state to the corresponding action
         if(dead){
@@ -227,12 +236,13 @@ public class Skeleton {
      * @param playerBody
      * @param attackTime
      */
+    @Override
     public void hit(boolean isPlayerAttacking, Body playerBody, float attackTime){
-        if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1  && isPlayerAttacking && attackTime > 0.2 && canBeHit ){
+        if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 2  && isPlayerAttacking && attackTime > 0.2 && canBeHit ){
             isAttacked = true;
             health -= 1;
 
-        } else if(body.getPosition().x - playerBody.getPosition().x < 2 && body.getPosition().x - playerBody.getPosition().x > -1 && isPlayerAttacking  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1 && attackTime > 0.2 && canBeHit){
+        } else if(body.getPosition().x - playerBody.getPosition().x < 2 && body.getPosition().x - playerBody.getPosition().x > -1 && isPlayerAttacking  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 2 && attackTime > 0.2 && canBeHit){
             isAttacked = true;
             health -= 1;
         }
@@ -252,6 +262,7 @@ public class Skeleton {
      * @param playerBody
      * @param delta
      */
+    @Override
     public void attack(Body playerBody, float delta){
         if(!(attackTimer > 0)){
             isAttacking = false;
@@ -280,14 +291,24 @@ public class Skeleton {
             isAttacking = false;
             isHitting = false;
         }
-
     }
 
     /**
-     * Get a boolean value of whether or not the Skeleton is hitting
+     * Get a boolean value of whether the Skeleton is hitting or not
      * @return
      */
-    public boolean isHitting(){
+    @Override
+    public boolean getIsHitting(){
         return isHitting;
     }
+
+    /**
+     * Gets if the Skeleton isAttacking
+     * @return
+     */
+    @Override
+    public boolean getIsAttacking(){
+        return isAttacking;
+    }
+
 }

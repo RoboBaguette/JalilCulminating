@@ -1,17 +1,19 @@
 package jalil.sayeed;
 
-import com.badlogic.gdx.ai.steer.Steerable;
-import com.badlogic.gdx.ai.utils.Location;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 
 import static jalil.sayeed.Utils.Constants.PPM;
-
-public class Eye{
+/**
+ * Fllename: Eye.java
+ * Author: Jalil, S
+ * Date Created: January 9th
+ * Description: This class is responsible for all things regarding the Eye enemy
+ */
+public class Eye extends Enemies {
     private int health;
     private boolean canBeHit;
     private boolean isAttacked;
@@ -39,6 +41,9 @@ public class Eye{
     public boolean onFloor;
     private float attackTimer;
     private boolean isHitting;
+    private boolean runAway;
+    private float runAwayTimer;
+    private FixtureDef fixtureDef;
 
     /**
      * Constructor for Eye class
@@ -72,6 +77,8 @@ public class Eye{
         timer2 = 0;
         attackTimer = 0;
         onFloor = false;
+        runAway = false;
+        runAwayTimer = 0;
     }
 
     /**
@@ -81,44 +88,65 @@ public class Eye{
      * @param playerBody
      * @param attackTime
      */
+    @Override
     public void update(float delta, boolean isPlayerAttacking, Body playerBody, float attackTime) {
         timer += delta;
 
         int velocityX = 0;
         int velocityY = 0;
 
+        if(runAway && playerBody.getPosition().x > body.getPosition().x){
+            velocityX -= 2;
+            lookRight = false;
+            velocityY += 2;
+            runAwayTimer += delta;
+        } else if(runAway && playerBody.getPosition().x < body.getPosition().x){
+            velocityX += 2;
+            velocityY += 2;
+            lookRight = true;
+            runAwayTimer += delta;
+        }
+        if(runAwayTimer > 2){
+            runAway = false;
+            runAwayTimer = 0;
+        }
         // Runs basic movement for the eye that follows the player if it isn't dead
-        if(!dead) {
-            if (playerBody.getPosition().x > body.getPosition().x) {
-                velocityX += 1;
-                lookRight = true;
-            }
-            if (playerBody.getPosition().x < body.getPosition().x) {
-                velocityX -= 1;
-                lookRight = false;
-            }
-            if (playerBody.getPosition().y < body.getPosition().y) {
-                velocityY -= 1;
-            }
-            if (playerBody.getPosition().y > body.getPosition().y) {
-                velocityY += 1;
+
+        if(!dead && !runAway) {
+            if (playerBody.getPosition().x < x + 30 && playerBody.getPosition().x > +-20 && playerBody.getPosition().y < y + 8 && playerBody.getPosition().y > y - 8) {
+                if (playerBody.getPosition().x > body.getPosition().x) {
+                    velocityX += 1.2f;
+                    lookRight = true;
+                }
+                if (playerBody.getPosition().x < body.getPosition().x) {
+                    velocityX -= 1.2f;
+                    lookRight = false;
+                }
+                if (playerBody.getPosition().y < body.getPosition().y) {
+                    velocityY -= 1.2f;
+                }
+                if (playerBody.getPosition().y > body.getPosition().y) {
+                    velocityY += 1.2f;
+                }
             }
         }
 
         // Stops the Eye if its attacked and moves the eye if isAttacked is false
-        if(isAttacked){
+        if(isAttacked || dead){
             body.setLinearVelocity(0, 0);
         } else {
             body.setLinearVelocity(velocityX * 2, velocityY * 2);
         }
         draw(delta);
         hit(isPlayerAttacking, playerBody, attackTime);
+        attack(playerBody, delta);
     }
 
     /**
      * Draw the Eye's current frame
      * @param delta
      */
+    @Override
     public void draw(float delta) {
         getFrame(delta);
         batch.begin();
@@ -130,6 +158,7 @@ public class Eye{
      * Gets the currentFrame of the Eye depending on it's curret state
      * @param dt
      */
+    @Override
     public void getFrame(float dt) {
         currentState = getState();
 
@@ -164,6 +193,7 @@ public class Eye{
      * @param x
      * @param y
      */
+    @Override
     public void createBody(int x, int y) {
         // Initialize body
         BodyDef bodyDef = new BodyDef();
@@ -176,7 +206,7 @@ public class Eye{
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(32 / 2.2f / PPM, 32 / 2 / PPM / 1.2f);
 
-        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0;
         fixtureDef.friction = 0.8f;
@@ -186,7 +216,6 @@ public class Eye{
 
 
         body.createFixture(fixtureDef).setUserData(this);
-
         shape.dispose();
     }
 
@@ -194,6 +223,7 @@ public class Eye{
      * Gets the Eye's body
      * @return
      */
+    @Override
     public Body getBody() {
         createBody(x, y);
         return body;
@@ -205,6 +235,9 @@ public class Eye{
      */
     public State getState() {
         if (dead) {
+            if(body.getFixtureList().size > 0) {
+                body.destroyFixture(body.getFixtureList().get(0));
+            }
             return State.DEAD;
         } else if (isAttacked) {
             return State.HURT;
@@ -216,20 +249,23 @@ public class Eye{
     }
 
     /**
-     * Checks if the player is hit
+     * Checks if the Eye has been hit
      * @param isPlayerAttacking
      * @param playerBody
      * @param attackTime
      */
+    @Override
     public void hit(boolean isPlayerAttacking, Body playerBody, float attackTime){
         // Creates an area where the player can hit the Eye if the player is attacking and detects if it is attacked or not
-        if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
+        if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1   && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
             isAttacked = true;
             health -= 1;
+            runAway = true;
 
-        } else if(body.getPosition().x - playerBody.getPosition().x < 2 && body.getPosition().x - playerBody.getPosition().x > -1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
+        } else if(body.getPosition().x - playerBody.getPosition().x < 2 && body.getPosition().x - playerBody.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
             isAttacked = true;
             health -= 1;
+            runAway = true;
         }
         // Resets variables
         if(attackTime > 0 && isAttacked){
@@ -243,21 +279,26 @@ public class Eye{
         }
     }
 
+    /**
+     * Attack for the eye
+     * @param playerBody
+     * @param delta
+     */
+    @Override
     public void attack(Body playerBody, float delta){
         if(!(attackTimer > 0)){
             isAttacking = false;
             isHitting = false;
         }
 
-        if(playerBody.getPosition().x - body.getPosition().x < 4 && playerBody.getPosition().x - body.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
-
+        if(playerBody.getPosition().x - body.getPosition().x < 3 && playerBody.getPosition().x - body.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
             isAttacking = true;
-            if(attackTimer > 1.5 && playerBody.getPosition().x - body.getPosition().x < 4 && playerBody.getPosition().x - body.getPosition().x > -1){
+            if(attackTimer > 1.5 && playerBody.getPosition().x - body.getPosition().x < 3 && playerBody.getPosition().x - body.getPosition().x > -1){
                 isHitting = true;
             }
-        } else if(body.getPosition().x - playerBody.getPosition().x < 4 && body.getPosition().x - playerBody.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
+        } else if(body.getPosition().x - playerBody.getPosition().x < 3 && body.getPosition().x - playerBody.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
             isAttacking = true;
-            if(attackTimer > 1.5 && body.getPosition().x - playerBody.getPosition().x < 4 && body.getPosition().x - playerBody.getPosition().x > -1){
+            if(attackTimer > 1.5 && body.getPosition().x - playerBody.getPosition().x < 3 && body.getPosition().x - playerBody.getPosition().x > -1){
                 isHitting = true;
             }
         }
@@ -270,7 +311,23 @@ public class Eye{
             attackTimer = 0;
             isAttacking = false;
             isHitting = false;
+            runAway = true;
         }
 
     }
+
+    /**
+     * Gets isHitting
+     * @return
+     */
+    @Override
+    public boolean getIsHitting(){
+        return isHitting;
+    }
+
+    @Override
+    public boolean getIsAttacking(){
+        return isAttacking;
+    }
+
 }

@@ -2,6 +2,7 @@ package jalil.sayeed;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,6 +38,7 @@ public class Player {
     private boolean isAttacking = false;
     private float stateTimer;
 
+
     /**
      * Constructor class for player
      * @param x
@@ -70,6 +72,12 @@ public class Player {
 
     }
 
+
+    public void createSoundEffects(Sound run, Sound jump, Sound slash){
+        run = Gdx.audio.newSound(Gdx.files.internal("Audio/Soundeffects/Run.wav"));
+
+
+    }
     /**
      * Player input
      * @param batch
@@ -86,33 +94,34 @@ public class Player {
             attackTime += delta;
         }
 
-        // Basic movement and attacks
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            velocity -= 1;
-            lookRight = false;
-            playerSprite = new Texture("RunRightSprites/adventurer-run-00.png");
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && lookRight) {
-            body.applyForce(1000.0f, 0f, body.getPosition().x, body.getPosition().y, true);
-        } else if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !lookRight){
-            body.applyForce(-1000.0f, 0f, body.getPosition().x, body.getPosition().y, true);
-        }
+        if(health >= 0) {
+            // Basic movement and attacks
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                velocity -= 1;
+                lookRight = false;
+                playerSprite = new Texture("RunRightSprites/adventurer-run-00.png");
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && lookRight) {
+                body.applyForce(1000.0f, 0f, body.getPosition().x, body.getPosition().y, true);
+            } else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !lookRight) {
+                body.applyForce(-1000.0f, 0f, body.getPosition().x, body.getPosition().y, true);
+            }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            velocity += 1;
-            lookRight = true;
-        }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                velocity += 1;
+                lookRight = true;
+            }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isJump) {
-            canJump = false;
-            body.applyLinearImpulse(new Vector2(0, 15), body.getPosition(), canJump);
-            isJump = true;
-        }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isJump) {
+                canJump = false;
+                body.applyLinearImpulse(new Vector2(0, 15), body.getPosition(), canJump);
+                isJump = true;
+            }
 
-        if (body.getLinearVelocity().y < 0.1 && body.getLinearVelocity().y > -0.1) {
-            isJump = false;
+            if (body.getLinearVelocity().y < 0.1 && body.getLinearVelocity().y > -0.1) {
+                isJump = false;
+            }
         }
-
 
 
         // Sets the speed of the body
@@ -161,7 +170,6 @@ public class Player {
      * @return
      */
     public State getState() {
-
         // Checks what the player is doing and returns the state that represents whatever its doing
         if(health <= 0){
             return State.DEAD;
@@ -221,6 +229,7 @@ public class Player {
             case STANDING:
             default:
                 currentFrame = idle.getKeyFrame(stateTimer, true);
+                break;
         }
 
         // flips the player depending on where they are facing
@@ -277,9 +286,10 @@ public class Player {
             health -= 1;
             isHurt = true;
         }
-        if(!isHitting){
+        else if(!isHitting){
             isHurt = false;
         }
+        System.out.println(health);
     }
 
 }

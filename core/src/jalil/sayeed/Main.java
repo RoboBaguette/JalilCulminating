@@ -2,6 +2,8 @@ package jalil.sayeed;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,8 +19,16 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import jalil.sayeed.Utils.TiledUtil;
 
+import java.util.ArrayList;
+
 import static jalil.sayeed.Utils.Constants.PPM;
 
+/**
+ * Fllename: Main.java
+ * Author: Jalil, S
+ * Date Created: December 19th
+ * Description: The Aain class for the project it extends ApplicationAdapter and creates, renders, updates, and disposes of all things within the game
+ */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
     private World world;
@@ -33,8 +43,6 @@ public class Main extends ApplicationAdapter {
     private Texture playerSprite;
     private TextureAtlas atlas;
     private TextureAtlas enemyAtlas;
-    private Body eyeBody1;
-    private Eye eye1;
     private Animation<TextureRegion> playerRun;
     private Animation<TextureRegion> playerJump;
     private Animation<TextureRegion> playerIdle;
@@ -43,22 +51,44 @@ public class Main extends ApplicationAdapter {
     private Animation<TextureRegion> playerSlide;
     private Animation<TextureRegion> playerHurt;
     private Animation<TextureRegion> playerDead;
-
     private Animation<TextureRegion> eyeFly;
     private Animation<TextureRegion> eyeAttack;
     private Animation<TextureRegion> eyeHurt;
     private Animation<TextureRegion> eyeDeath;
     private Body skeletonBody1;
     private Skeleton skeleton1;
+    private Skeleton skeleton2;
+    private Skeleton skeleton3;
+    private Skeleton skeleton4;
+    private Skeleton skeleton5;
+    private Skeleton skeleton6;
+    private Body skeletonBody2;
+    private Body skeletonBody3;
+    private Body skeletonBody4;
+    private Body skeletonBody5;
+    private Body skeletonBody6;
+    private Eye eye1;
+    private Eye eye2;
+    private Eye eye3;
+    private Eye eye4;
+    private Eye eye5;
+    private Eye eye6;
+    private Body eyeBody1;
+    private Body eyeBody2;
+    private Body eyeBody3;
+    private Body eyeBody4;
+    private Body eyeBody5;
+    private Body eyeBody6;
     private Animation<TextureRegion> skeletonAttack;
     private Animation<TextureRegion> skeletonWalk;
     private Animation<TextureRegion> skeletonDeath;
     private Animation<TextureRegion> skeletonHurt;
     private Animation<TextureRegion> skeletonIdle;
-
+    private ArrayList<Enemies> enemies;
     private Player player;
     private final float frameTime = 1 / 5f;
-
+    private float timer;
+    public static AssetManager manager;
 
     /**
      * Create everything in the game
@@ -68,19 +98,25 @@ public class Main extends ApplicationAdapter {
         // Initialize Box2D
         Box2D.init();
 
+
         float height = Gdx.graphics.getHeight();
         float width = Gdx.graphics.getWidth();
+
 
         // Setup camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, width / 2, height / 2);
 
+        enemies = new ArrayList<>();
 
         // Initial Setup
         world = new World(new Vector2(0, -19.6f), false);
         debugRenderer = new Box2DDebugRenderer();
 
         batch = new SpriteBatch();
+
+        timer = 0;
+
 
         // Setup map
         map = new TmxMapLoader().load("MainMap.tmx");
@@ -135,6 +171,9 @@ public class Main extends ApplicationAdapter {
         eyeDeath = new Animation(frameTime, enemyAtlas.findRegions("EyeDeath"));
         eyeDeath.setFrameDuration(frameTime);
 
+        eyeAttack = new Animation(frameTime, enemyAtlas.findRegions("EyeAttack"));
+        eyeAttack.setFrameDuration(frameTime);
+
         // Skeleton Animations
         skeletonWalk = new Animation(frameTime, enemyAtlas.findRegions("SkeletonWalk"));
         skeletonWalk.setFrameDuration(frameTime);
@@ -157,8 +196,6 @@ public class Main extends ApplicationAdapter {
         // Setup players and enemies
         int x = 10;
         int y = 60;
-        eye1 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeFly, batch);
-        eyeBody1 = eye1.getBody();
 
         player = new Player(x, y, world, playerRun, playerJump, playerIdle, playerFalling, playerAttack, playerSlide, playerHurt, playerDead);
         player.createBody(x, y);
@@ -166,10 +203,76 @@ public class Main extends ApplicationAdapter {
         playerBody = player.getBody();
         playerSprite = player.getPlayerSprite();
 
+        x = 30;
+        eye1 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeAttack, batch);
+        eyeBody1 = eye1.getBody();
+
+        x = 130;
+        eye2 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeAttack, batch);
+        eyeBody2 = eye2.getBody();
+
+        y = 50;
+        x = 120;
+        eye3 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeAttack, batch);
+        eyeBody3 = eye3.getBody();
+
+        y = 56;
+        x = 124;
+        eye4 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeAttack, batch);
+        eyeBody4 = eye4.getBody();
+
+        y = 20;
+        x = 38;
+        eye5 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeAttack, batch);
+        eyeBody5 = eye5.getBody();
+
+        x = 60;
+        eye6 = new Eye(x, y, world, eyeDeath, eyeFly, eyeHurt, eyeAttack, batch);
+        eyeBody6 = eye6.getBody();
+
+
+
         x = 40;
         y = 62;
         skeleton1 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
         skeletonBody1 = skeleton1.getBody();
+
+        x = 32;
+        y = 22;
+        skeleton2 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
+        skeletonBody2 = skeleton2.getBody();
+
+        x = 48;
+        y = 68;
+        skeleton3 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
+        skeletonBody3 = skeleton3.getBody();
+
+        x = 70;
+        y = 22;
+        skeleton4 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
+        skeletonBody4 = skeleton4.getBody();
+
+        skeleton5 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
+        skeletonBody5 = skeleton5.getBody();
+
+        x = 20;
+        y = 42;
+        skeleton6 = new Skeleton(x, y, world, skeletonAttack, skeletonDeath, skeletonHurt, skeletonWalk, skeletonIdle, batch);
+        skeletonBody6 = skeleton6.getBody();
+
+
+        enemies.add(skeleton1);
+        enemies.add(eye1);
+        enemies.add(skeleton2);
+        enemies.add(skeleton3);
+        enemies.add(skeleton4);
+        enemies.add(skeleton5);
+        enemies.add(skeleton6);
+        enemies.add(eye2);
+        enemies.add(eye3);
+        enemies.add(eye4);
+        enemies.add(eye5);
+        enemies.add(eye6);
     }
 
     /**
@@ -190,7 +293,7 @@ public class Main extends ApplicationAdapter {
 
         // Render tile map
         mapRenderer.render();
-       // debugRenderer.render(world, camera.combined.scl(PPM));
+        debugRenderer.render(world, camera.combined.scl(PPM));
 
         update(Gdx.graphics.getDeltaTime());
     }
@@ -216,12 +319,23 @@ public class Main extends ApplicationAdapter {
         world.step(1 / 60f, 6, 2);
         cameraUpdate();
 
-        skeleton1.update(delta,player.isAttacking(), playerBody, player.getAttackTime());
-        eye1.update(delta,player.isAttacking(), playerBody, player.getAttackTime());
+        for (Enemies enemy : enemies) {
+            enemy.update(delta, player.isAttacking(), playerBody, player.getAttackTime());
+            if(!skeleton1.getIsAttacking() && !eye1.getIsAttacking() &&!skeleton2.getIsAttacking() && !skeleton3.getIsAttacking() &&!skeleton4.getIsAttacking() && !skeleton5.getIsAttacking() && !skeleton6.getIsAttacking() && !eye2.getIsAttacking() && !eye3.getIsAttacking() && !eye4.getIsAttacking() && !eye5.getIsAttacking() && !eye6.getIsAttacking() ){
+                player.hit(false);
+            }
+        }
+        for(Enemies enemy: enemies){
+            if (enemy.getIsAttacking()) {
+                player.hit(enemy.getIsHitting());
+                break;
+            }
+        }
+
         batch.setProjectionMatrix(camera.combined);
         player.input(batch, delta);
-        player.hit(skeleton1.isHitting());
         mapRenderer.setView(camera);
+
     }
 
     /**
@@ -240,5 +354,6 @@ public class Main extends ApplicationAdapter {
         background3.dispose();
         enemyAtlas.dispose();
         atlas.dispose();
+        manager.dispose();
     }
 }
