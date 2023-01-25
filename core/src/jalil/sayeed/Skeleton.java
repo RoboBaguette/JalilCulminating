@@ -116,8 +116,8 @@ public class Skeleton extends Enemies{
         }
 
         draw(delta);
-        hit(isPlayerAttacking, playerBody, attackTime);
-        attack(playerBody, delta);
+        hurt(isPlayerAttacking, playerBody, attackTime);
+        attack(playerBody);
     }
 
     /**
@@ -237,7 +237,7 @@ public class Skeleton extends Enemies{
      * @param attackTime
      */
     @Override
-    public void hit(boolean isPlayerAttacking, Body playerBody, float attackTime){
+    public void hurt(boolean isPlayerAttacking, Body playerBody, float attackTime){
         if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1  && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 2  && isPlayerAttacking && attackTime > 0.2 && canBeHit ){
             isAttacked = true;
             health -= 1;
@@ -260,32 +260,35 @@ public class Skeleton extends Enemies{
     /**
      * Checks if the Skeleton is attacking
      * @param playerBody
-     * @param delta
      */
     @Override
-    public void attack(Body playerBody, float delta){
+    public void attack(Body playerBody){
+        // Reset variables
         if(!(attackTimer > 0)){
             isAttacking = false;
             isHitting = false;
         }
 
-        if(playerBody.getPosition().x - body.getPosition().x < 4 && playerBody.getPosition().x - body.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
+        // Checks if the player is within a certain radius and attacks the player
+        if(playerBody.getPosition().x - body.getPosition().x < 4 && playerBody.getPosition().x - body.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 2 && playerBody.getPosition().y > body.getPosition().y - 1){
 
             isAttacking = true;
             if(attackTimer > 1.5 && playerBody.getPosition().x - body.getPosition().x < 4 && playerBody.getPosition().x - body.getPosition().x > -1){
                 isHitting = true;
             }
-        } else if(body.getPosition().x - playerBody.getPosition().x < 4 && body.getPosition().x - playerBody.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
+        } else if(body.getPosition().x - playerBody.getPosition().x < 4 && body.getPosition().x - playerBody.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 2 && playerBody.getPosition().y > body.getPosition().y - 1){
             isAttacking = true;
             if(attackTimer > 1.5 && body.getPosition().x - playerBody.getPosition().x < 4 && body.getPosition().x - playerBody.getPosition().x > -1){
                 isHitting = true;
             }
         }
+        // Resets variables if dead
         if(dead){
             isAttacking = false;
             isHitting = false;
         }
 
+        // Times the attacks
         if(attackTimer > 2.5){
             attackTimer = 0;
             isAttacking = false;

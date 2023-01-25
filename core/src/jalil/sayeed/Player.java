@@ -40,7 +40,7 @@ public class Player {
 
 
     /**
-     * Constructor class for player
+     * Constructor Player class
      * @param x
      * @param y
      * @param world
@@ -72,57 +72,53 @@ public class Player {
 
     }
 
-
-    public void createSoundEffects(Sound run, Sound jump, Sound slash){
-        run = Gdx.audio.newSound(Gdx.files.internal("Audio/Soundeffects/Run.wav"));
-
-
-    }
     /**
      * Player input
      * @param batch
      * @param delta
      */
-    public void input(SpriteBatch batch, float delta) {
+    public void update(SpriteBatch batch, float delta) {
         int velocity = 0;
         boolean canJump;
 
         getFrame(delta);
 
 
+        // Begins attack timer if the player is attacking
         if (isAttacking) {
             attackTime += delta;
         }
 
+        // Basic movement and attacks inputs
         if(health >= 0) {
-            // Basic movement and attacks
+            // Move left
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
                 velocity -= 1;
                 lookRight = false;
                 playerSprite = new Texture("RunRightSprites/adventurer-run-00.png");
-            }
+            } // Slide right
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && lookRight) {
                 body.applyForce(1000.0f, 0f, body.getPosition().x, body.getPosition().y, true);
-            } else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !lookRight) {
+            }  // Slide left
+            else if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && !lookRight) {
                 body.applyForce(-1000.0f, 0f, body.getPosition().x, body.getPosition().y, true);
             }
-
+            // Move right
             if (Gdx.input.isKeyPressed(Input.Keys.D)) {
                 velocity += 1;
                 lookRight = true;
             }
-
+            // Jump
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isJump) {
                 canJump = false;
                 body.applyLinearImpulse(new Vector2(0, 15), body.getPosition(), canJump);
                 isJump = true;
             }
-
+            // Makes sure the player is on the ground before they can jump again
             if (body.getLinearVelocity().y < 0.1 && body.getLinearVelocity().y > -0.1) {
                 isJump = false;
             }
         }
-
 
         // Sets the speed of the body
         if(health > 0) {
@@ -146,11 +142,13 @@ public class Player {
         bodyDef.position.set(x, y);
         bodyDef.fixedRotation = false;
 
+        // Create body
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(32 / 2 / PPM / 2, 32 / 2 / PPM);
 
+        // Create fixture
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0;
@@ -168,6 +166,7 @@ public class Player {
     /**
      * Get the player's state
      * @return
+     * From this video: https://www.youtube.com/watch?v=1fJrhgc0RRw&list=PLZm85UZQLd2SXQzsF-a0-pPF6IWDDdrXt&index=11
      */
     public State getState() {
         // Checks what the player is doing and returns the state that represents whatever its doing
@@ -198,6 +197,7 @@ public class Player {
     /**
      * Get animation frame
      * @param dt
+     * From this video: https://www.youtube.com/watch?v=1fJrhgc0RRw&list=PLZm85UZQLd2SXQzsF-a0-pPF6IWDDdrXt&index=11
      */
     public void getFrame(float dt) {
         // Get its state
@@ -281,7 +281,7 @@ public class Player {
      * Checks if the player has been hit or not
      * @param isHitting
      */
-    public void hit(boolean isHitting){
+    public void isHit(boolean isHitting){
         if(isHitting && !isHurt) {
             health -= 1;
             isHurt = true;
@@ -289,7 +289,6 @@ public class Player {
         else if(!isHitting){
             isHurt = false;
         }
-        System.out.println(health);
     }
 
 }

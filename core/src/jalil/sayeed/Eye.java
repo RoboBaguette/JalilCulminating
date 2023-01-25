@@ -46,7 +46,7 @@ public class Eye extends Enemies {
     private FixtureDef fixtureDef;
 
     /**
-     * Constructor for Eye class
+     * Constructor for eye class
      * @param x
      * @param y
      * @param world
@@ -95,6 +95,7 @@ public class Eye extends Enemies {
         int velocityX = 0;
         int velocityY = 0;
 
+        // Has the enemy fly away from the player
         if(runAway && playerBody.getPosition().x > body.getPosition().x){
             velocityX -= 2;
             lookRight = false;
@@ -106,14 +107,15 @@ public class Eye extends Enemies {
             lookRight = true;
             runAwayTimer += delta;
         }
-        if(runAwayTimer > 2){
+        // Stops the enemy from running away after timer hits 2
+        if(runAwayTimer > 1.8){
             runAway = false;
             runAwayTimer = 0;
         }
-        // Runs basic movement for the eye that follows the player if it isn't dead
 
+        // Runs basic movement for the eye that follows the player if it isn't dead
         if(!dead && !runAway) {
-            if (playerBody.getPosition().x < x + 30 && playerBody.getPosition().x > +-20 && playerBody.getPosition().y < y + 8 && playerBody.getPosition().y > y - 8) {
+            if (playerBody.getPosition().x < x + 30 && playerBody.getPosition().x > x -30 && playerBody.getPosition().y < y + 14 && playerBody.getPosition().y > y - 14) {
                 if (playerBody.getPosition().x > body.getPosition().x) {
                     velocityX += 1.2f;
                     lookRight = true;
@@ -138,8 +140,8 @@ public class Eye extends Enemies {
             body.setLinearVelocity(velocityX * 2, velocityY * 2);
         }
         draw(delta);
-        hit(isPlayerAttacking, playerBody, attackTime);
-        attack(playerBody, delta);
+        hurt(isPlayerAttacking, playerBody, attackTime);
+        attack(playerBody);
     }
 
     /**
@@ -162,6 +164,7 @@ public class Eye extends Enemies {
     public void getFrame(float dt) {
         currentState = getState();
 
+        // Depending on the currentState of the player, currentFrame will equal the frame that corresponds to that state
         switch (currentState) {
             case DEAD:
                 currentFrame = death.getKeyFrame(stateTimer, false);
@@ -201,11 +204,13 @@ public class Eye extends Enemies {
         bodyDef.position.set(x, y);
         bodyDef.fixedRotation = false;
 
+        // Create body
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(32 / 2.2f / PPM, 32 / 2 / PPM / 1.2f);
 
+        // Create fixture
         fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0;
@@ -255,7 +260,7 @@ public class Eye extends Enemies {
      * @param attackTime
      */
     @Override
-    public void hit(boolean isPlayerAttacking, Body playerBody, float attackTime){
+    public void hurt(boolean isPlayerAttacking, Body playerBody, float attackTime){
         // Creates an area where the player can hit the Eye if the player is attacking and detects if it is attacked or not
         if(playerBody.getPosition().x - body.getPosition().x < 2 && playerBody.getPosition().x - body.getPosition().x > -1   && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1 && isPlayerAttacking && attackTime > 0.2 && canBeHit){
             isAttacked = true;
@@ -282,15 +287,16 @@ public class Eye extends Enemies {
     /**
      * Attack for the eye
      * @param playerBody
-     * @param delta
      */
     @Override
-    public void attack(Body playerBody, float delta){
+    public void attack(Body playerBody){
+        // Reset variables
         if(!(attackTimer > 0)){
             isAttacking = false;
             isHitting = false;
         }
 
+        // Checks if the player is within a certain radius and attacks the player
         if(playerBody.getPosition().x - body.getPosition().x < 3 && playerBody.getPosition().x - body.getPosition().x > -1 && playerBody.getPosition().y < body.getPosition().y + 1.4 && playerBody.getPosition().y > body.getPosition().y - 1){
             isAttacking = true;
             if(attackTimer > 1.5 && playerBody.getPosition().x - body.getPosition().x < 3 && playerBody.getPosition().x - body.getPosition().x > -1){
@@ -302,11 +308,14 @@ public class Eye extends Enemies {
                 isHitting = true;
             }
         }
+
+        // Resets variables if dead
         if(dead){
             isAttacking = false;
             isHitting = false;
         }
 
+        // Times the attack
         if(attackTimer > 2.5){
             attackTimer = 0;
             isAttacking = false;
@@ -325,6 +334,10 @@ public class Eye extends Enemies {
         return isHitting;
     }
 
+    /**
+     * Get isAttacking
+     * @return
+     */
     @Override
     public boolean getIsAttacking(){
         return isAttacking;

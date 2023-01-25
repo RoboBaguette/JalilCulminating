@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.*;
  * Author: Jalil, S
  * Date Created: December 20th
  * Description: This class is responsible for creating collision lines from the tiled map
+ * From https://www.youtube.com/watch?v=BcbjBEnIWKU&list=PLD_bW3UTVsElsuvyKcYXHLnWb8bD0EQNI&index=5
  */
 public class TiledUtil {
     public static void parseTiledObjectLayer(World world, MapObjects objects) {
