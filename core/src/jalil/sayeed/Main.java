@@ -338,7 +338,7 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Dispose
+     * Dispose to avoid memory leaks
      */
     @Override
     public void dispose() {
