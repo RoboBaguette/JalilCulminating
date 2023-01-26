@@ -73,7 +73,7 @@ public class Player {
     }
 
     /**
-     * Player input
+     * Updates the player
      * @param batch
      * @param delta
      */
