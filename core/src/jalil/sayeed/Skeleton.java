@@ -11,7 +11,7 @@ import static jalil.sayeed.Utils.Constants.PPM;
  * Fllename: Skeleton.java
  * Author: Jalil, S
  * Date Created: January 16th
- * Description: This class is responsible for all things regarding the Skeleton enemy
+ * Description: This class is responsible for  creating, animating, and running the Skeleton enemy
  */
 public class Skeleton extends Enemies{
     private int health;

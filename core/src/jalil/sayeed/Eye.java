@@ -11,7 +11,7 @@ import static jalil.sayeed.Utils.Constants.PPM;
  * Fllename: Eye.java
  * Author: Jalil, S
  * Date Created: January 9th
- * Description: This class is responsible for all things regarding the Eye enemy
+ * Description: This class is responsible  creating, animating, and running the Eye enemy
  */
 public class Eye extends Enemies {
     private int health;

@@ -12,6 +12,13 @@ import com.badlogic.gdx.physics.box2d.*;
 
 import static jalil.sayeed.Utils.Constants.PPM;
 
+/**
+ * Fllename: Player.java
+ * Author: Jalil, S
+ * Date Created: December 20th
+ * Description: This class is responsible creating, animating, and running the player
+ * From https://www.youtube.com/watch?v=BcbjBEnIWKU&list=PLD_bW3UTVsElsuvyKcYXHLnWb8bD0EQNI&index=5
+ */
 public class Player {
     private enum State {FALLING, JUMPING, STANDING, RUNNING, SLIDE, ATTACKING, HURT, DEAD}
     private int health;
