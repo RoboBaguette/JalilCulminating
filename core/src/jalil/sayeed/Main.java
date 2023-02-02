@@ -33,11 +33,11 @@ import static jalil.sayeed.Utils.Constants.PPM;
  * Enemy sprites: https://luizmelo.itch.io/monsters-creatures-fantasy
  * Tiled Map Editor: https://www.mapeditor.org/
  * Controls:
- * A to move let
- * D to move right
- * SPACE to jump
- * J to attack
- * LEFT SHIFT to slide
+ * A: to move let
+ * D: to move right
+ * SPACE: to jump
+ * J: to attack
+ * LEFT SHIFT: to slide
  */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
