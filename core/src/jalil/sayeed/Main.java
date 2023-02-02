@@ -31,6 +31,13 @@ import static jalil.sayeed.Utils.Constants.PPM;
  * Player sprites: https://rvros.itch.io/animated-pixel-hero
  * TileSet: https://szadiart.itch.io/platformer-fantasy-set1
  * Enemy sprites: https://luizmelo.itch.io/monsters-creatures-fantasy
+ * Tiled Map Editor: https://www.mapeditor.org/
+ * Controls:
+ * A to move let
+ * D to move right
+ * SPACE to jump
+ * J to attack
+ * LEFT SHIFT to slide
  */
 public class Main extends ApplicationAdapter {
     private SpriteBatch batch;
