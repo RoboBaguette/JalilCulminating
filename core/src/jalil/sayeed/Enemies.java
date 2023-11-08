@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Body;
  * Author: Jalil, S
  * Date Created: January 22th
  * Description: This class creates a baseline for any enemies
- * The getFrame method is from this video https://www.youtube.com/watch?v=1fJrhgc0RRw&list=PLZm85UZQLd2SXQzsF-a0-pPF6IWDDdrXt&index=11
  */
 public abstract class Enemies {
     public abstract void update(float delta, boolean isPlayerAttacking, Body playerBody, float attackTIme);
