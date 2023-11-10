@@ -3,7 +3,9 @@ Description:
 Final school project, a 2D platformer made with the LibGDX framework.
 
 Design Document: https://docs.google.com/document/d/16brrWbIbzrme1Q5BVu793JE_UY328kYkTL-ciH-V6fg/edit?usp=sharing
+
 Test Document: https://docs.google.com/document/d/127Vu4OEERC6aKEvujduX5loDaNa91m9KhYwy_hLHoH0/edit?usp=sharing
+
 Agile Software Development Schedule: https://trello.com/b/HcSvENoB/ics4u-culminating
 
 Credit:
