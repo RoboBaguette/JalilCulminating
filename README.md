@@ -9,7 +9,11 @@ Test Document: https://docs.google.com/document/d/127Vu4OEERC6aKEvujduX5loDaNa91
 Agile Software Development Schedule: https://trello.com/b/HcSvENoB/ics4u-culminating
 
 Credit:
+
 Player sprites: https://rvros.itch.io/animated-pixel-hero
+
 TileSet: https://szadiart.itch.io/platformer-fantasy-set1
+
 Enemy sprites: https://luizmelo.itch.io/monsters-creatures-fantasy
+
 Tiled Map Editor: https://www.mapeditor.org/
